@@ -1,16 +1,19 @@
 {
 	"folders": [
 		{
+			"path": "."
+		},
+		{
+			"path": "examples/hello"
+		},
+		{
 			"path": "exercise/a_variables"
 		},
 		{
 			"path": "exercise/b_functions"
 		},
 		{
-			"path": "examples/hello"
-		},
-		{
-			"path": "."
+			"path": "exercise/c_simple_types"
 		}
 	],
 	"settings": {}
