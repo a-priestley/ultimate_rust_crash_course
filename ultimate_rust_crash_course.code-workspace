@@ -14,6 +14,9 @@
 		},
 		{
 			"path": "exercise/c_simple_types"
+		},
+		{
+			"path": "exercise/d_control_flow_strings"
 		}
 	],
 	"settings": {}
