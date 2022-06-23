@@ -17,6 +17,9 @@
 		},
 		{
 			"path": "exercise/d_control_flow_strings"
+		},
+		{
+			"path": "exercise/e_ownership_references"
 		}
 	],
 	"settings": {}
