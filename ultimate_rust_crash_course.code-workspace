@@ -20,6 +20,9 @@
 		},
 		{
 			"path": "exercise/e_ownership_references"
+		},
+		{
+			"path": "exercise/f_structs_traits"
 		}
 	],
 	"settings": {}
