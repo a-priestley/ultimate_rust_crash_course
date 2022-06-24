@@ -29,6 +29,9 @@
 		},
 		{
 			"path": "exercise/h_closures_threads"
+		},
+		{
+			"path": "invaders"
 		}
 	],
 	"settings": {}
