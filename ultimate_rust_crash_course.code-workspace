@@ -23,6 +23,9 @@
 		},
 		{
 			"path": "exercise/f_structs_traits"
+		},
+		{
+			"path": "exercise/g_collections_enums"
 		}
 	],
 	"settings": {}
