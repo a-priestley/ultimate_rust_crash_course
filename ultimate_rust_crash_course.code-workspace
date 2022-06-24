@@ -26,6 +26,9 @@
 		},
 		{
 			"path": "exercise/g_collections_enums"
+		},
+		{
+			"path": "exercise/h_closures_threads"
 		}
 	],
 	"settings": {}
