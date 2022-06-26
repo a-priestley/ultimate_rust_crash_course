@@ -32,6 +32,9 @@
 		},
 		{
 			"path": "invaders"
+		},
+		{
+			"path": "web_api_experiment"
 		}
 	],
 	"settings": {}

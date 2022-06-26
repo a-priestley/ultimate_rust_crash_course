@@ -4,7 +4,7 @@ use rusty_time::timer::Timer;
 
 use crate::{
     frame::{Drawable, Frame},
-    NUM_COLS, NUM_ROWS,
+    settings::Settings,
 };
 
 pub struct Invader {
@@ -19,14 +19,14 @@ pub struct Invaders {
 }
 
 impl Invaders {
-    pub fn new() -> Self {
+    pub fn new(settings: &Settings) -> Self {
         let mut army = Vec::new();
-        for x in 0..NUM_COLS {
-            for y in 0..NUM_ROWS {
+        for x in 0..settings.columns() {
+            for y in 0..settings.rows() {
                 if (x > 1)
-                    && (x < NUM_COLS - 2)
+                    && (x < settings.columns() - 2)
                     && (y > 0)
-                    && (y < NUM_ROWS / 2)
+                    && (y < settings.rows() / 2)
                     && (x % 2 == 0)
                     && (y % 2 == 0)
                 {
@@ -40,7 +40,7 @@ impl Invaders {
             direction: 1,
         }
     }
-    pub fn update(&mut self, delta: Duration) -> bool {
+    pub fn update(&mut self, delta: Duration, columns: usize) -> bool {
         self.move_timer.update(delta);
         if self.move_timer.ready {
             self.move_timer.reset();
@@ -53,7 +53,7 @@ impl Invaders {
                 }
             } else {
                 let max_x = self.army.iter().map(|invader| invader.x).max().unwrap_or(0);
-                if max_x == NUM_COLS - 1 {
+                if max_x == columns - 1 {
                     self.direction = -1;
                     downwards = true;
                 }
@@ -76,8 +76,8 @@ impl Invaders {
     pub fn all_killed(&self) -> bool {
         self.army.is_empty()
     }
-    pub fn reached_bottom(&self) -> bool {
-        self.army.iter().map(|invader| invader.y).max().unwrap_or(0) >= NUM_ROWS - 1
+    pub fn reached_bottom(&self, rows: usize) -> bool {
+        self.army.iter().map(|invader| invader.y).max().unwrap_or(0) >= rows - 1
     }
     pub fn kill_invader_at(&mut self, x: usize, y: usize) -> bool {
         if let Some(idx) = self

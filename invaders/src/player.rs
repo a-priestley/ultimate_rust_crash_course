@@ -3,8 +3,8 @@ use std::time::Duration;
 use crate::{
     frame::{Drawable, Frame},
     invaders::Invaders,
+    settings::Settings,
     shot::Shot,
-    NUM_COLS, NUM_ROWS,
 };
 
 pub struct Player {
@@ -14,10 +14,10 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new() -> Self {
+    pub fn new(settings: &Settings) -> Self {
         Self {
-            x: NUM_COLS / 2,
-            y: NUM_ROWS - 1,
+            x: settings.columns() / 2,
+            y: settings.rows() - 1,
             shots: Vec::new(),
         }
     }
@@ -26,8 +26,8 @@ impl Player {
             self.x -= 1;
         }
     }
-    pub fn move_right(&mut self) {
-        if self.x < NUM_COLS - 1 {
+    pub fn move_right(&mut self, columns: usize) {
+        if self.x < columns - 1 {
             self.x += 1;
         }
     }

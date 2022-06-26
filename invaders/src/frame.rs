@@ -1,12 +1,10 @@
-use crate::{NUM_COLS, NUM_ROWS};
-
 pub type Frame = Vec<Vec<&'static str>>;
 
-pub fn new_frame() -> Frame {
-    let mut cols = Vec::with_capacity(NUM_COLS);
-    for _ in 0..NUM_COLS {
-        let mut col = Vec::with_capacity(NUM_ROWS);
-        for _ in 0..NUM_ROWS {
+pub fn new_frame(columns: usize, rows: usize) -> Frame {
+    let mut cols = Vec::with_capacity(columns);
+    for _ in 0..columns {
+        let mut col = Vec::with_capacity(rows);
+        for _ in 0..rows {
             col.push(" ");
         }
         cols.push(col);

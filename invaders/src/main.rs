@@ -17,6 +17,7 @@ use invaders::{
     invaders::Invaders,
     player::Player,
     render,
+    settings::Settings,
 };
 use rusty_audio::Audio;
 
@@ -30,6 +31,29 @@ fn main() -> Result<(), Box<dyn Error>> {
     audio.add("win", "win.wav");
     audio.play("startup");
 
+    // Config API
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    let mut request_url: String = "".to_string();
+    let response;
+
+    for arg in args {
+        if arg == "easy" {
+            request_url = format!("http://localhost:5131/easy");
+        } else if arg == "hard" {
+            request_url = format!("http://localhost:5131/hard");
+        }
+    }
+    response = reqwest::blocking::get(&request_url)?;
+    let settings: Settings;
+    if response.status().is_success() {
+        settings = response.json()?;
+    } else {
+        settings = Settings::new()
+    }
+    let columns = settings.columns();
+    let rows = settings.rows();
+    let color = settings.color().to_string();
+
     // Terminal
     let mut stdout = io::stdout();
     terminal::enable_raw_mode()?;
@@ -39,35 +63,35 @@ fn main() -> Result<(), Box<dyn Error>> {
     // Render Loop in a Separate Thread
     let (render_tx, render_rx) = mpsc::channel();
     let render_handle = thread::spawn(move || {
-        let mut last_frame = frame::new_frame();
+        let mut last_frame = frame::new_frame(columns, rows);
         let mut stdout = io::stdout();
-        render::render(&mut stdout, &last_frame, &last_frame, true);
+        render::render(&mut stdout, &last_frame, &last_frame, true, &color);
         loop {
             let curr_frame = match render_rx.recv() {
                 Ok(x) => x,
                 Err(_) => break,
             };
-            render::render(&mut stdout, &last_frame, &curr_frame, false);
+            render::render(&mut stdout, &last_frame, &curr_frame, false, &color);
             last_frame = curr_frame;
         }
     });
 
     // Game Loop
-    let mut player = Player::new();
+    let mut player = Player::new(&settings);
     let mut instant = Instant::now();
-    let mut invaders = Invaders::new();
+    let mut invaders = Invaders::new(&settings);
     'gameloop: loop {
         // Per-frame Init
         let delta = instant.elapsed();
         instant = Instant::now();
-        let mut curr_frame = new_frame();
+        let mut curr_frame = new_frame(columns, rows);
 
         // Input
         while event::poll(Duration::default())? {
             if let Event::Key(key_event) = event::read()? {
                 match key_event.code {
                     KeyCode::Left | KeyCode::Char('a') => player.move_left(),
-                    KeyCode::Right | KeyCode::Char('d') => player.move_right(),
+                    KeyCode::Right | KeyCode::Char('d') => player.move_right(columns),
                     KeyCode::Enter | KeyCode::Char(' ') => {
                         if player.shoot() {
                             audio.play("pew");
@@ -84,7 +108,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
         // Updates
         player.update(delta);
-        if invaders.update(delta) {
+        if invaders.update(delta, columns) {
             audio.play("move");
         }
         if player.detect_hits(&mut invaders) {
@@ -104,7 +128,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             audio.play("win");
             break 'gameloop;
         }
-        if invaders.reached_bottom() {
+        if invaders.reached_bottom(settings.rows()) {
             audio.play("lose");
             break 'gameloop;
         }
