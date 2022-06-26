@@ -19,22 +19,23 @@ use invaders::{
     render,
     settings::Settings,
 };
-use rusty_audio::Audio;
+// use rusty_audio::Audio;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let mut audio = Audio::new();
-    audio.add("explode", "explode.wav");
-    audio.add("lose", "lose.wav");
-    audio.add("move", "move.wav");
-    audio.add("pew", "pew.wav");
-    audio.add("startup", "startup.wav");
-    audio.add("win", "win.wav");
-    audio.play("startup");
+    // let mut audio = Audio::new();
+    // audio.add("explode", "explode.wav");
+    // audio.add("lose", "lose.wav");
+    // audio.add("move", "move.wav");
+    // audio.add("pew", "pew.wav");
+    // audio.add("startup", "startup.wav");
+    // audio.add("win", "win.wav");
+    // audio.play("startup");
 
     // Config API
     let args: Vec<String> = std::env::args().skip(1).collect();
     let mut request_url: String = "".to_string();
-    let response;
+    let mut response;
+    let mut settings = Settings::new();
 
     for arg in args {
         if arg == "easy" {
@@ -42,13 +43,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         } else if arg == "hard" {
             request_url = format!("http://localhost:5131/hard");
         }
-    }
-    response = reqwest::blocking::get(&request_url)?;
-    let settings: Settings;
-    if response.status().is_success() {
-        settings = response.json()?;
-    } else {
-        settings = Settings::new()
+        response = reqwest::blocking::get(&request_url)?;
+        if response.status().is_success() {
+            settings = response.json()?;
+        }
     }
     let columns = settings.columns();
     let rows = settings.rows();
@@ -94,11 +92,11 @@ fn main() -> Result<(), Box<dyn Error>> {
                     KeyCode::Right | KeyCode::Char('d') => player.move_right(columns),
                     KeyCode::Enter | KeyCode::Char(' ') => {
                         if player.shoot() {
-                            audio.play("pew");
+                            // audio.play("pew");
                         }
                     }
                     KeyCode::Esc | KeyCode::Char('q') => {
-                        audio.play("lose");
+                        // audio.play("lose");
                         break 'gameloop;
                     }
                     _ => {}
@@ -109,10 +107,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         // Updates
         player.update(delta);
         if invaders.update(delta, columns) {
-            audio.play("move");
+            // audio.play("move");
         }
         if player.detect_hits(&mut invaders) {
-            audio.play("explode");
+            // audio.play("explode");
         }
 
         // Draw & Render
@@ -125,11 +123,11 @@ fn main() -> Result<(), Box<dyn Error>> {
 
         // Win or Lose?
         if invaders.all_killed() {
-            audio.play("win");
+            // audio.play("win");
             break 'gameloop;
         }
         if invaders.reached_bottom(settings.rows()) {
-            audio.play("lose");
+            // audio.play("lose");
             break 'gameloop;
         }
     }
@@ -137,7 +135,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // Cleanup
     drop(render_tx);
     render_handle.join().unwrap();
-    audio.wait();
+    // audio.wait();
     stdout.execute(Show)?;
     stdout.execute(LeaveAlternateScreen)?;
     terminal::disable_raw_mode()?;
