@@ -1,4 +1,5 @@
 use std::{
+    env,
     error::Error,
     io,
     sync::mpsc,
@@ -38,10 +39,17 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut settings = Settings::new();
 
     for arg in args {
-        if arg == "easy" {
-            request_url = format!("http://localhost:5131/easy");
-        } else if arg == "hard" {
-            request_url = format!("http://localhost:5131/hard");
+        let key = "API_HOST";
+        match env::var(key) {
+            Ok(val) => {
+                if arg == "easy" {
+                    request_url = format!("{}/easy", val);
+                } else if arg == "hard" {
+                    request_url = format!("{}/hard", val);
+                } else {
+                }
+            }
+            Err(e) => println!("couldn't interpret {}: {}", key, e),
         }
         response = reqwest::blocking::get(&request_url)?;
         if response.status().is_success() {
